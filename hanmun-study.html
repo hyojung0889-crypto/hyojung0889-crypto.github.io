@@ -1,0 +1,805 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>한문 QUEST</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+:root{
+  --bg:#0f0c29;--bg2:#1a1640;--bg3:#231e52;--card:#1e1a45;--card2:#27225a;
+  --accent:#a78bfa;--accent2:#7c3aed;--gold:#fbbf24;--gold2:#f59e0b;
+  --green:#00c47a;--red:#ff4444;--text:#e2e0ff;--text2:#a09ec0;--border:#3d3870;
+}
+html,body{height:100%;overflow-x:hidden;}
+body{font-family:-apple-system,BlinkMacSystemFont,'Noto Sans KR','Apple SD Gothic Neo',sans-serif;background:var(--bg);color:var(--text);display:flex;justify-content:center;}
+.app{max-width:430px;width:100%;min-height:100%;padding-bottom:40px;}
+.screen{display:none;}.screen.active{display:block;}
+.header{display:flex;align-items:center;gap:10px;padding:14px 16px;border-bottom:1px solid var(--border);background:var(--bg2);position:sticky;top:0;z-index:10;}
+.header-title{font-size:17px;font-weight:700;color:#fff;flex:1;text-align:center;}
+.hbtn{background:#4c1d95;border:2px solid #a78bfa;border-radius:10px;cursor:pointer;color:#e9d5ff;font-size:13px;font-weight:700;padding:8px 12px;display:flex;align-items:center;gap:4px;min-width:60px;justify-content:center;-webkit-appearance:none;}
+.hright{font-size:13px;color:var(--gold);font-weight:700;min-width:60px;text-align:right;}
+.hero{background:var(--bg2);padding:20px 16px 16px;border-bottom:1px solid var(--border);}
+.hero-top{display:flex;align-items:center;gap:12px;margin-bottom:14px;}
+.hero-icon{width:52px;height:52px;min-width:52px;background:var(--accent2);border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:26px;}
+.hero-title{font-size:22px;font-weight:800;color:#fff;}
+.hero-sub{font-size:12px;color:var(--accent);margin-top:2px;}
+.xp-label{display:flex;justify-content:space-between;font-size:11px;color:var(--text2);margin-bottom:4px;}
+.xp-bar-wrap{background:var(--bg3);border-radius:8px;height:10px;overflow:hidden;}
+.xp-bar{height:100%;background:var(--accent);border-radius:8px;transition:width .4s;}
+.stat-row{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;padding:12px 16px;}
+.stat-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:12px 8px;text-align:center;}
+.stat-card .snum{font-size:22px;font-weight:800;color:var(--gold);}
+.stat-card .slbl{font-size:11px;color:var(--text2);margin-top:3px;}
+.menu-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:10px 16px;}
+.menu-btn{background:var(--card);border:2px solid var(--border);border-radius:16px;padding:18px 12px;cursor:pointer;text-align:center;position:relative;overflow:hidden;-webkit-appearance:none;width:100%;}
+.menu-btn:active{opacity:.8;}
+.menu-btn .micon{font-size:28px;margin-bottom:10px;display:block;}
+.menu-btn .mname{font-size:14px;font-weight:700;color:#fff;display:block;}
+.menu-btn .mdesc{font-size:11px;color:var(--text2);margin-top:4px;display:block;}
+.menu-btn.exam{grid-column:1/-1;background:var(--accent2);border-color:#9333ea;display:flex;align-items:center;justify-content:center;gap:14px;padding:18px 20px;}
+.menu-btn.exam .mname,.menu-btn.exam .mdesc{color:#fff;text-align:left;}
+.badge-new{position:absolute;top:10px;right:10px;background:var(--gold);color:#1a1a1a;font-size:10px;font-weight:800;padding:2px 7px;border-radius:8px;}
+.chap-list{padding:12px 16px;display:flex;flex-direction:column;gap:8px;}
+.chap-item{background:var(--card);border:2px solid var(--border);border-radius:14px;padding:16px;cursor:pointer;display:flex;align-items:center;justify-content:space-between;-webkit-appearance:none;width:100%;}
+.chap-item:active{opacity:.8;}
+.ci-left{display:flex;align-items:center;gap:12px;}
+.chap-badge{font-size:12px;font-weight:700;padding:5px 12px;border-radius:20px;}
+.badge-6{background:#312e81;color:#a5b4fc;}.badge-7{background:#1e3a5f;color:#7dd3fc;}
+.badge-8{background:#2d1b4e;color:#d8b4fe;}.badge-all{background:#064e3b;color:#6ee7b7;}
+.badge-hard{background:#431407;color:#fca5a5;}
+.chap-title{font-size:15px;font-weight:600;color:var(--text);}
+.chap-arrow{color:var(--accent);font-size:14px;font-weight:700;}
+.pbar-wrap{height:5px;background:var(--bg3);}
+.pbar-fill{height:100%;background:var(--accent);transition:width .3s;}
+.card-area{padding:12px 16px 6px;}
+.card-inner{background:var(--card2);border:2px solid #5b5490;border-radius:20px;min-height:240px;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:28px;text-align:center;width:100%;}
+.card-inner:active{opacity:.85;}
+.card-hanja{font-size:96px;color:#fff;line-height:1;}
+.card-hint{font-size:13px;color:var(--text2);margin-top:18px;}
+.card-reading{font-size:34px;font-weight:800;color:var(--accent);}
+.card-meaning{font-size:22px;color:#fff;margin-top:10px;}
+.card-chap{font-size:12px;color:var(--text2);margin-top:12px;}
+.fc-actions{display:flex;gap:10px;padding:8px 16px 4px;}
+.fc-btn{flex:1;padding:16px;border-radius:14px;cursor:pointer;font-size:16px;font-weight:800;border:none;display:flex;align-items:center;justify-content:center;gap:8px;-webkit-appearance:none;}
+.fc-btn:active{opacity:.8;}
+.fc-btn.wrong{background:#ff4444;color:#fff;}
+.fc-btn.right{background:#00c47a;color:#fff;}
+.fc-nav{display:flex;gap:10px;padding:8px 16px 14px;}
+.fc-nav-btn{flex:1;padding:14px;background:#fff;border:none;border-radius:14px;cursor:pointer;font-size:15px;font-weight:800;color:#3c3489;display:flex;align-items:center;justify-content:center;gap:6px;-webkit-appearance:none;}
+.fc-nav-btn:active{opacity:.8;}
+.quiz-wrap{padding:12px 16px;}
+.quiz-q-card{background:var(--card2);border:2px solid #5b5490;border-radius:16px;padding:24px;text-align:center;margin-bottom:14px;min-height:130px;display:flex;align-items:center;justify-content:center;}
+.quiz-q-hanja{font-size:80px;color:#fff;line-height:1;}
+.quiz-q-text{font-size:17px;font-weight:600;color:var(--text);line-height:1.6;}
+.quiz-opts{display:flex;flex-direction:column;gap:8px;}
+.quiz-opt{background:#2d2860;border:2px solid #5b5490;border-radius:12px;padding:14px 16px;cursor:pointer;font-size:15px;color:#fff;text-align:left;display:flex;align-items:center;gap:12px;font-weight:500;-webkit-appearance:none;width:100%;}
+.quiz-opt:active{opacity:.8;}
+.quiz-opt.correct{background:#00c47a;border-color:#00c47a;color:#fff;font-weight:700;}
+.quiz-opt.wrong{background:#ff4444;border-color:#ff4444;color:#fff;font-weight:700;}
+.quiz-opt.reveal-correct{background:#00c47a;border-color:#00c47a;color:#fff;font-weight:700;}
+.opt-num{width:30px;height:30px;min-width:30px;border-radius:50%;background:#ffffff22;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:800;color:#fff;border:2px solid #ffffff55;}
+.quiz-fb{padding:14px;border-radius:10px;margin-top:12px;font-size:15px;text-align:center;font-weight:800;}
+.quiz-fb.ok{background:#00c47a;color:#fff;}
+.quiz-fb.fail{background:#ff4444;color:#fff;}
+.next-btn{width:100%;margin-top:12px;padding:16px;background:#fff;color:#3c3489;border:none;border-radius:12px;font-size:16px;cursor:pointer;font-weight:800;-webkit-appearance:none;display:block;}
+.next-btn:active{opacity:.8;}
+.idiom-card{background:var(--card2);border:2px solid var(--gold2);border-radius:16px;padding:24px;text-align:center;margin-bottom:14px;}
+.idiom-hanja{font-size:34px;font-weight:800;color:var(--gold);letter-spacing:6px;}
+.idiom-reading{font-size:16px;color:var(--gold2);margin-top:10px;}
+.wrong-list{padding:12px 16px;display:flex;flex-direction:column;gap:8px;}
+.wrong-item{background:var(--card);border:2px solid var(--border);border-radius:12px;padding:14px 16px;display:flex;align-items:center;gap:14px;}
+.wrong-hanja{font-size:36px;color:#fff;min-width:48px;text-align:center;}
+.wrong-info .wread{font-size:15px;font-weight:600;color:var(--text);}
+.wrong-info .wmean{font-size:13px;color:var(--text2);margin-top:2px;}
+.wrong-badge{margin-left:auto;background:#ff4444;color:#fff;font-size:11px;font-weight:700;padding:5px 10px;border-radius:10px;white-space:nowrap;}
+.empty-state{text-align:center;padding:48px 16px;}
+.clear-btn{margin:0 16px 12px;width:calc(100% - 32px);padding:13px;background:#ff4444;color:#fff;border:none;border-radius:10px;cursor:pointer;font-size:14px;font-weight:700;-webkit-appearance:none;}
+.exam-setup-inner{padding:16px;}
+.exam-group{margin-bottom:18px;}
+.exam-group-label{font-size:12px;color:var(--text2);margin-bottom:10px;display:block;font-weight:700;letter-spacing:1px;}
+.chk-row{display:flex;gap:8px;flex-wrap:wrap;}
+.echk{padding:10px 16px;border:2px solid #5b5490;border-radius:20px;cursor:pointer;font-size:13px;color:var(--text2);background:#2d2860;font-weight:700;-webkit-appearance:none;}
+.echk:active{opacity:.8;}
+.echk.on{background:#a78bfa;border-color:#a78bfa;color:#1a1640;}
+.exam-start{width:100%;padding:16px;background:#fff;color:#3c3489;border:none;border-radius:12px;font-size:17px;cursor:pointer;font-weight:800;margin-top:8px;-webkit-appearance:none;}
+.exam-start:active{opacity:.8;}
+.exam-timer-wrap{display:flex;align-items:center;gap:6px;font-size:14px;color:var(--gold);font-weight:700;}
+.quest-done{padding:20px 16px;}
+.quest-done-hero{background:var(--card2);border:2px solid #5b5490;border-radius:20px;padding:24px;text-align:center;margin-bottom:16px;}
+.quest-done-icon{font-size:52px;margin-bottom:10px;}
+.quest-done-title{font-size:20px;font-weight:800;color:#fff;margin-bottom:4px;}
+.quest-done-sub{font-size:13px;color:var(--text2);}
+.quest-done-stats{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px;}
+.qds{background:var(--card);border:2px solid var(--border);border-radius:12px;padding:14px;text-align:center;}
+.qds .qdsn{font-size:26px;font-weight:800;}
+.qds .qdsl{font-size:12px;color:var(--text2);margin-top:4px;}
+.qds.ok .qdsn{color:var(--green);}
+.qds.fail .qdsn{color:var(--red);}
+.qds.accent .qdsn{color:var(--accent);}
+.qds.gold .qdsn{color:var(--gold);}
+.quest-done-divider{font-size:11px;font-weight:700;color:var(--text2);letter-spacing:1px;margin:4px 0 8px;text-align:center;}
+.qd-btn{width:100%;padding:14px 16px;border-radius:12px;font-size:14px;font-weight:700;cursor:pointer;margin-bottom:8px;display:flex;align-items:center;justify-content:center;gap:8px;border:none;-webkit-appearance:none;text-align:center;}
+.qd-btn:active{opacity:.8;}
+.qd-btn.primary{background:#fff;color:#3c3489;}
+.qd-btn.gold-btn{background:var(--gold);color:#1a1a1a;}
+.qd-btn.secondary{background:#2d2860;color:#e2e0ff;border:2px solid #5b5490;}
+.qd-btn.home-btn{background:#1a1640;color:var(--text2);border:2px solid #3d3870;}
+.next-menu-label{font-size:10px;opacity:.6;font-weight:600;margin-top:2px;}
+.result-wrap{padding:24px 16px;text-align:center;}
+.result-score-big{font-size:80px;font-weight:900;color:#fff;}
+.result-pts{font-size:16px;color:var(--text2);margin-top:4px;}
+.result-grade{font-size:38px;margin:10px 0;}
+.result-row{display:flex;gap:16px;justify-content:center;margin:16px 0;}
+.rstat .rnum{font-size:28px;font-weight:800;}
+.rstat .rlbl{font-size:12px;color:var(--text2);}
+.rstat.ok .rnum{color:var(--green);}
+.rstat.fail .rnum{color:var(--red);}
+.rstat.total .rnum{color:var(--accent);}
+</style>
+</head>
+<body>
+<div class="app">
+
+<!-- HOME -->
+<div id="home" class="screen active">
+  <div class="hero">
+    <div class="hero-top">
+      <div class="hero-icon">📖</div>
+      <div><div class="hero-title" style="text-align:left;font-size:22px">한문 QUEST</div><div class="hero-sub">6과 · 7과 · 8과 — 기말고사 정복</div></div>
+    </div>
+    <div class="xp-label"><span>학습 진도</span><span id="xp-text">0 / 124 한자</span></div>
+    <div class="xp-bar-wrap"><div class="xp-bar" id="xp-bar" style="width:0%"></div></div>
+  </div>
+  <div class="stat-row">
+    <div class="stat-card"><div class="snum" id="total-learned">0</div><div class="slbl">✅ 완료</div></div>
+    <div class="stat-card"><div class="snum" id="total-wrong" style="color:#ff4444">0</div><div class="slbl">❌ 오답</div></div>
+    <div class="stat-card"><div class="snum" id="total-quiz" style="color:#00c47a">0</div><div class="slbl">🎮 풀이</div></div>
+  </div>
+  <div class="menu-grid">
+    <button class="menu-btn" onclick="go('flash-chap')"><span class="micon">🃏</span><span class="mname">플래시카드</span><span class="mdesc">한자 암기 훈련</span></button>
+    <button class="menu-btn" onclick="go('quiz-chap')"><span class="micon">🎯</span><span class="mname">객관식 퀴즈</span><span class="mdesc">5지선다 도전</span></button>
+    <button class="menu-btn" onclick="go('word-chap')"><span class="micon">📗</span><span class="mname">단어 퀴즈</span><span class="mdesc">한자어 5지선다</span><span class="badge-new">NEW</span></button>
+    <button class="menu-btn" onclick="go('idiom-screen')"><span class="micon">✨</span><span class="mname">사자성어</span><span class="mdesc">성어 뜻 맞히기</span></button>
+    <button class="menu-btn" onclick="go('wrong-screen')"><span class="micon">📕</span><span class="mname">오답노트</span><span class="mdesc">틀린 문제 복습</span></button>
+    <button class="menu-btn exam" onclick="go('exam-setup')"><span style="font-size:32px">⚔️</span><div><span class="mname" style="font-size:16px;display:block">시험 모드</span><span class="mdesc">기말고사 대비 보스전</span></div></button>
+  </div>
+</div>
+
+<!-- FLASH CHAP -->
+<div id="flash-chap" class="screen">
+  <div class="header"><button class="hbtn" onclick="go('home')">← 홈</button><div class="header-title">플래시카드</div><div style="min-width:60px"></div></div>
+  <div class="chap-list">
+    <button class="chap-item" onclick="startFlash(0)"><div class="ci-left"><span class="chap-badge badge-6">6과</span><span class="chap-title">수와 방향, 대립 한자</span></div><span class="chap-arrow">47자 →</span></button>
+    <button class="chap-item" onclick="startFlash(1)"><div class="ci-left"><span class="chap-badge badge-7">7과</span><span class="chap-title">사물과 자연, 우정</span></div><span class="chap-arrow">39자 →</span></button>
+    <button class="chap-item" onclick="startFlash(2)"><div class="ci-left"><span class="chap-badge badge-8">8과</span><span class="chap-title">말과 사람, 쇠와 길</span></div><span class="chap-arrow">38자 →</span></button>
+    <button class="chap-item" onclick="startFlash(3)"><div class="ci-left"><span class="chap-badge badge-all">전체</span><span class="chap-title">6~8과 전체</span></div><span class="chap-arrow">전체 →</span></button>
+  </div>
+</div>
+
+<!-- FLASHCARD -->
+<div id="flash-screen" class="screen">
+  <div class="header"><button class="hbtn" onclick="go('flash-chap')">← 목록</button><div class="header-title" id="flash-title">플래시카드</div><span class="hright" id="fc-prog"></span></div>
+  <div class="pbar-wrap"><div class="pbar-fill" id="fc-pbar"></div></div>
+  <div id="fc-main">
+    <div class="card-area">
+      <button class="card-inner" onclick="revealCard()" style="background:var(--card2);border:2px solid #5b5490;border-radius:20px;min-height:240px;">
+        <div id="fc-front" style="display:flex;flex-direction:column;align-items:center"><div class="card-hanja" id="fc-hanja"></div><div class="card-hint">👆 탭하여 정답 확인</div></div>
+        <div id="fc-back" style="display:none;text-align:center"><div class="card-reading" id="fc-reading"></div><div class="card-meaning" id="fc-meaning"></div><div class="card-chap" id="fc-chap"></div></div>
+      </button>
+    </div>
+    <div class="fc-actions" id="fc-actions" style="display:none">
+      <button class="fc-btn wrong" onclick="markCard(false)">✕ 모르겠어</button>
+      <button class="fc-btn right" onclick="markCard(true)">✓ 알았어!</button>
+    </div>
+    <div class="fc-nav">
+      <button class="fc-nav-btn" onclick="navCard(-1)">← 이전</button>
+      <button class="fc-nav-btn" onclick="navCard(1)">다음 →</button>
+    </div>
+  </div>
+  <div id="fc-done" style="display:none" class="quest-done">
+    <div class="quest-done-hero"><div class="quest-done-icon">🎴</div><div class="quest-done-title">플래시카드 완료!</div><div class="quest-done-sub" id="fc-done-sub"></div></div>
+    <div class="quest-done-stats">
+      <div class="qds ok"><div class="qdsn" id="fc-ok">0</div><div class="qdsl">✅ 알았어!</div></div>
+      <div class="qds fail"><div class="qdsn" id="fc-fail">0</div><div class="qdsl">❌ 모르겠어</div></div>
+    </div>
+    <div class="quest-done-divider">다시 하기</div>
+    <button class="qd-btn primary" onclick="retryWrong()">🔄 틀린 것만 다시</button>
+    <button class="qd-btn secondary" onclick="startFlash(S.lastChap)">↺ 전체 다시하기</button>
+    <div class="quest-done-divider" style="margin-top:4px">다음 퀘스트</div>
+    <button class="qd-btn gold-btn" onclick="go('quiz-chap')">🎯 객관식 퀴즈로 이동<div class="next-menu-label">다음 단계 ▶</div></button>
+    <button class="qd-btn secondary" onclick="go('word-chap')">📗 단어 퀴즈로 이동</button>
+    <div class="quest-done-divider" style="margin-top:4px">나가기</div>
+    <button class="qd-btn home-btn" onclick="go('home')">🏠 홈으로 돌아가기</button>
+  </div>
+</div>
+
+<!-- QUIZ CHAP -->
+<div id="quiz-chap" class="screen">
+  <div class="header"><button class="hbtn" onclick="go('home')">← 홈</button><div class="header-title">객관식 퀴즈</div><div style="min-width:60px"></div></div>
+  <div class="chap-list">
+    <button class="chap-item" onclick="startQuiz(0,'hm')"><div class="ci-left"><span class="chap-badge badge-6">6과</span><span class="chap-title">한자 → 뜻 맞히기</span></div><span class="chap-arrow">→</span></button>
+    <button class="chap-item" onclick="startQuiz(1,'hm')"><div class="ci-left"><span class="chap-badge badge-7">7과</span><span class="chap-title">한자 → 뜻 맞히기</span></div><span class="chap-arrow">→</span></button>
+    <button class="chap-item" onclick="startQuiz(2,'hm')"><div class="ci-left"><span class="chap-badge badge-8">8과</span><span class="chap-title">한자 → 뜻 맞히기</span></div><span class="chap-arrow">→</span></button>
+    <button class="chap-item" onclick="startQuiz(3,'hm')"><div class="ci-left"><span class="chap-badge badge-all">전체</span><span class="chap-title">6~8과 전체</span></div><span class="chap-arrow">→</span></button>
+    <button class="chap-item" onclick="startQuiz(3,'mh')"><div class="ci-left"><span class="chap-badge badge-hard">심화</span><span class="chap-title">뜻 → 한자 맞히기</span></div><span class="chap-arrow">→</span></button>
+  </div>
+</div>
+
+<!-- WORD CHAP -->
+<div id="word-chap" class="screen">
+  <div class="header"><button class="hbtn" onclick="go('home')">← 홈</button><div class="header-title">단어 퀴즈</div><div style="min-width:60px"></div></div>
+  <div class="chap-list">
+    <button class="chap-item" onclick="startWordQuiz(0)"><div class="ci-left"><span class="chap-badge badge-6">6과</span><span class="chap-title">동사 · 형용사 단어</span></div><span class="chap-arrow">→</span></button>
+    <button class="chap-item" onclick="startWordQuiz(1)"><div class="ci-left"><span class="chap-badge badge-7">7과</span><span class="chap-title">사물 · 자연 단어</span></div><span class="chap-arrow">→</span></button>
+    <button class="chap-item" onclick="startWordQuiz(2)"><div class="ci-left"><span class="chap-badge badge-8">8과</span><span class="chap-title">말 · 사람 단어</span></div><span class="chap-arrow">→</span></button>
+    <button class="chap-item" onclick="startWordQuiz(3)"><div class="ci-left"><span class="chap-badge badge-all">전체</span><span class="chap-title">6~8과 전체 단어</span></div><span class="chap-arrow">→</span></button>
+  </div>
+</div>
+
+<!-- QUIZ SCREEN -->
+<div id="quiz-screen" class="screen">
+  <div class="header"><button class="hbtn" id="quiz-back-btn" onclick="go('quiz-chap')">← 목록</button><div class="header-title" id="quiz-title">퀴즈</div><span class="hright" id="quiz-prog"></span></div>
+  <div class="pbar-wrap"><div class="pbar-fill" id="quiz-pbar"></div></div>
+  <div id="quiz-main">
+    <div class="quiz-wrap">
+      <div class="quiz-q-card"><div id="quiz-qc"></div></div>
+      <div class="quiz-opts" id="quiz-opts"></div>
+      <div id="quiz-fb"></div>
+      <button class="next-btn" id="quiz-next" style="display:none" onclick="nextQuiz()">다음 문제 →</button>
+    </div>
+  </div>
+  <div id="quiz-done" style="display:none" class="quest-done">
+    <div class="quest-done-hero"><div class="quest-done-icon" id="quiz-done-icon">🎯</div><div class="quest-done-title" id="quiz-done-title">퀴즈 완료!</div><div class="quest-done-sub" id="quiz-done-sub"></div></div>
+    <div class="quest-done-stats">
+      <div class="qds ok"><div class="qdsn" id="quiz-ok">0</div><div class="qdsl">✅ 정답</div></div>
+      <div class="qds fail"><div class="qdsn" id="quiz-fail">0</div><div class="qdsl">❌ 오답</div></div>
+      <div class="qds accent"><div class="qdsn" id="quiz-score">0</div><div class="qdsl">점수</div></div>
+      <div class="qds gold"><div class="qdsn" id="quiz-total">0</div><div class="qdsl">총 문제</div></div>
+    </div>
+    <div class="quest-done-divider">다시 하기</div>
+    <button class="qd-btn primary" onclick="reStartQuiz()">↺ 같은 퀴즈 다시</button>
+    <button class="qd-btn secondary" id="quiz-reselect-btn" onclick="go('quiz-chap')">📋 다른 과 선택</button>
+    <div class="quest-done-divider" style="margin-top:4px">다음 퀘스트</div>
+    <button class="qd-btn gold-btn" id="quiz-next-quest-btn" onclick="go('idiom-screen')">✨ 사자성어 퀴즈로<div class="next-menu-label">다음 단계 ▶</div></button>
+    <button class="qd-btn secondary" onclick="go('exam-setup')">⚔️ 시험 모드 도전!</button>
+    <div class="quest-done-divider" style="margin-top:4px">나가기</div>
+    <button class="qd-btn home-btn" onclick="go('home')">🏠 홈으로 돌아가기</button>
+  </div>
+</div>
+
+<!-- IDIOM -->
+<div id="idiom-screen" class="screen">
+  <div class="header"><button class="hbtn" onclick="go('home')">← 홈</button><div class="header-title">사자성어 퀴즈</div><span class="hright" id="idiom-prog"></span></div>
+  <div class="pbar-wrap"><div class="pbar-fill" id="idiom-pbar"></div></div>
+  <div id="idiom-main">
+    <div class="quiz-wrap">
+      <div class="idiom-card"><div class="idiom-hanja" id="idiom-hanja"></div><div class="idiom-reading" id="idiom-reading"></div></div>
+      <div class="quiz-opts" id="idiom-opts"></div>
+      <div id="idiom-fb"></div>
+      <button class="next-btn" id="idiom-next" style="display:none" onclick="nextIdiom()">다음 →</button>
+    </div>
+  </div>
+  <div id="idiom-done" style="display:none" class="quest-done">
+    <div class="quest-done-hero"><div class="quest-done-icon">✨</div><div class="quest-done-title">사자성어 완료!</div><div class="quest-done-sub">15개 성어 모두 학습</div></div>
+    <div class="quest-done-stats">
+      <div class="qds ok"><div class="qdsn" id="idiom-ok">0</div><div class="qdsl">✅ 정답</div></div>
+      <div class="qds fail"><div class="qdsn" id="idiom-fail">0</div><div class="qdsl">❌ 오답</div></div>
+      <div class="qds accent"><div class="qdsn" id="idiom-score">0</div><div class="qdsl">점수</div></div>
+      <div class="qds gold"><div class="qdsn">15</div><div class="qdsl">총 문제</div></div>
+    </div>
+    <div class="quest-done-divider">다시 하기</div>
+    <button class="qd-btn primary" onclick="initIdiom()">↺ 사자성어 다시</button>
+    <div class="quest-done-divider" style="margin-top:4px">다음 퀘스트</div>
+    <button class="qd-btn gold-btn" onclick="go('exam-setup')">⚔️ 시험 모드 도전!<div class="next-menu-label">최종 보스전 ▶</div></button>
+    <button class="qd-btn secondary" onclick="go('wrong-screen')">📕 오답노트 확인</button>
+    <div class="quest-done-divider" style="margin-top:4px">나가기</div>
+    <button class="qd-btn home-btn" onclick="go('home')">🏠 홈으로 돌아가기</button>
+  </div>
+</div>
+
+<!-- WRONG -->
+<div id="wrong-screen" class="screen">
+  <div class="header"><button class="hbtn" onclick="go('home')">← 홈</button><div class="header-title">오답노트</div><div style="min-width:60px"></div></div>
+  <div id="wrong-content"></div>
+  <div style="padding:0 16px 16px">
+    <button class="qd-btn gold-btn" onclick="go('exam-setup')">⚔️ 시험 모드 도전!</button>
+    <button class="qd-btn home-btn" style="margin-top:8px" onclick="go('home')">🏠 홈으로 돌아가기</button>
+  </div>
+</div>
+
+<!-- EXAM SETUP -->
+<div id="exam-setup" class="screen">
+  <div class="header"><button class="hbtn" onclick="go('home')">← 홈</button><div class="header-title">시험 모드 설정</div><div style="min-width:60px"></div></div>
+  <div class="exam-setup-inner">
+    <div class="exam-group"><span class="exam-group-label">출제 범위</span><div class="chk-row"><button class="echk on" data-g="chap" data-v="0" onclick="toggleOpt(this)">6과</button><button class="echk on" data-g="chap" data-v="1" onclick="toggleOpt(this)">7과</button><button class="echk on" data-g="chap" data-v="2" onclick="toggleOpt(this)">8과</button></div></div>
+    <div class="exam-group"><span class="exam-group-label">문제 유형</span><div class="chk-row"><button class="echk on" data-g="type" data-v="hm" onclick="toggleOpt(this)">한자→뜻</button><button class="echk on" data-g="type" data-v="mh" onclick="toggleOpt(this)">뜻→한자</button><button class="echk on" data-g="type" data-v="word" onclick="toggleOpt(this)">단어</button><button class="echk on" data-g="type" data-v="idiom" onclick="toggleOpt(this)">사자성어</button></div></div>
+    <div class="exam-group"><span class="exam-group-label">문제 수</span><div class="chk-row"><button class="echk" data-g="cnt" data-v="10" onclick="selOne(this)">10문제</button><button class="echk on" data-g="cnt" data-v="20" onclick="selOne(this)">20문제</button><button class="echk" data-g="cnt" data-v="30" onclick="selOne(this)">30문제</button></div></div>
+    <div class="exam-group"><span class="exam-group-label">시간 제한</span><div class="chk-row"><button class="echk on" data-g="time" data-v="0" onclick="selOne(this)">제한없음</button><button class="echk" data-g="time" data-v="600" onclick="selOne(this)">10분</button><button class="echk" data-g="time" data-v="900" onclick="selOne(this)">15분</button></div></div>
+    <button class="exam-start" onclick="startExam()">⚔️ 시험 시작!</button>
+  </div>
+</div>
+
+<!-- EXAM -->
+<div id="exam-screen" class="screen">
+  <div class="header"><button class="hbtn" onclick="if(confirm('포기할까요?'))go('home')">← 포기</button><div class="header-title" id="exam-title">시험</div><div class="exam-timer-wrap">⏱<span id="exam-timer"></span></div></div>
+  <div class="pbar-wrap"><div class="pbar-fill" id="exam-pbar"></div></div>
+  <div class="quiz-wrap">
+    <div class="quiz-q-card"><div id="exam-qc"></div></div>
+    <div class="quiz-opts" id="exam-opts"></div>
+    <div id="exam-fb"></div>
+    <button class="next-btn" id="exam-next" style="display:none" onclick="nextExam()">다음 →</button>
+  </div>
+</div>
+
+<!-- RESULT -->
+<div id="result-screen" class="screen">
+  <div class="header"><div class="header-title">🏆 시험 결과</div></div>
+  <div class="result-wrap">
+    <div class="result-score-big" id="res-score"></div>
+    <div class="result-pts">점</div>
+    <div class="result-grade" id="res-grade"></div>
+    <div class="result-row">
+      <div class="rstat ok"><div class="rnum" id="res-ok"></div><div class="rlbl">정답</div></div>
+      <div class="rstat fail"><div class="rnum" id="res-fail"></div><div class="rlbl">오답</div></div>
+      <div class="rstat total"><div class="rnum" id="res-tot"></div><div class="rlbl">전체</div></div>
+    </div>
+    <div class="quest-done-divider">다시 하기</div>
+    <button class="qd-btn primary" onclick="startExam()">↺ 다시 도전</button>
+    <div class="quest-done-divider" style="margin-top:4px">오답 복습</div>
+    <button class="qd-btn secondary" onclick="go('wrong-screen')">📕 오답노트 확인</button>
+    <button class="qd-btn secondary" onclick="go('flash-chap')">🃏 플래시카드로 복습</button>
+    <div class="quest-done-divider" style="margin-top:4px">나가기</div>
+    <button class="qd-btn home-btn" onclick="go('home')">🏠 홈으로 돌아가기</button>
+  </div>
+</div>
+</div>
+
+<script>
+/* 효과음 */
+var AC=null;
+function getAC(){
+  if(!AC){try{AC=new(window.AudioContext||window.webkitAudioContext)();}catch(e){}}
+  return AC;
+}
+function playSound(type){
+  try{
+    var ac=getAC();if(!ac)return;
+    if(ac.state==='suspended')ac.resume();
+    var o=ac.createOscillator(),g=ac.createGain();
+    o.connect(g);g.connect(ac.destination);
+    var t=ac.currentTime;
+    if(type==='correct'){
+      o.frequency.setValueAtTime(523,t);o.frequency.setValueAtTime(659,t+0.1);o.frequency.setValueAtTime(784,t+0.2);
+      g.gain.setValueAtTime(0.25,t);g.gain.exponentialRampToValueAtTime(0.001,t+0.5);
+      o.start(t);o.stop(t+0.5);
+    }else if(type==='wrong'){
+      o.frequency.setValueAtTime(300,t);o.frequency.setValueAtTime(180,t+0.15);
+      g.gain.setValueAtTime(0.25,t);g.gain.exponentialRampToValueAtTime(0.001,t+0.35);
+      o.start(t);o.stop(t+0.35);
+    }else if(type==='flip'){
+      o.frequency.setValueAtTime(440,t);
+      g.gain.setValueAtTime(0.08,t);g.gain.exponentialRampToValueAtTime(0.001,t+0.08);
+      o.start(t);o.stop(t+0.08);
+    }else if(type==='complete'){
+      [523,659,784,1047].forEach(function(f,i){
+        var o2=ac.createOscillator(),g2=ac.createGain();
+        o2.connect(g2);g2.connect(ac.destination);
+        o2.frequency.value=f;
+        g2.gain.setValueAtTime(0.2,t+i*0.12);g2.gain.exponentialRampToValueAtTime(0.001,t+i*0.12+0.25);
+        o2.start(t+i*0.12);o2.stop(t+i*0.12+0.25);
+      });
+    }
+  }catch(e){}
+}
+
+var D={
+  ch6:[
+    {h:'出',r:'출',m:'나가다'},{h:'入',r:'입',m:'들어가다'},{h:'年',r:'년',m:'해'},{h:'歲',r:'세',m:'해'},
+    {h:'和',r:'화',m:'화목하다'},{h:'讀',r:'독',m:'읽다'},{h:'書',r:'서',m:'글, 책'},{h:'修',r:'수',m:'닦다'},
+    {h:'愛',r:'애',m:'사랑하다'},{h:'登',r:'등',m:'오르다'},{h:'多',r:'다',m:'많다'},{h:'情',r:'정',m:'뜻, 정'},
+    {h:'東',r:'동',m:'동쪽'},{h:'西',r:'서',m:'서쪽'},{h:'南',r:'남',m:'남쪽'},{h:'北',r:'북',m:'북쪽'},
+    {h:'前',r:'전',m:'앞'},{h:'後',r:'후',m:'뒤'},{h:'左',r:'좌',m:'왼쪽'},{h:'右',r:'우',m:'오른쪽'},
+    {h:'高',r:'고',m:'높다'},{h:'低',r:'저',m:'낮다'},{h:'長',r:'장',m:'길다'},{h:'短',r:'단',m:'짧다'},
+    {h:'強',r:'강',m:'강하다'},{h:'弱',r:'약',m:'약하다'},{h:'輕',r:'경',m:'가볍다'},{h:'重',r:'중',m:'무겁다'},
+    {h:'千',r:'천',m:'일천'},{h:'萬',r:'만',m:'일만'},{h:'億',r:'억',m:'억'},{h:'兆',r:'조',m:'조'},
+    {h:'席',r:'석',m:'자리'},{h:'試',r:'시',m:'시험하다'},{h:'昨',r:'작',m:'어제'},{h:'夜',r:'야',m:'밤'},
+    {h:'食',r:'식',m:'먹다'},{h:'感',r:'감',m:'느끼다'},{h:'動',r:'동',m:'움직이다'},{h:'問',r:'문',m:'묻다'},
+    {h:'題',r:'제',m:'제목'},{h:'英',r:'영',m:'꽃부리'},{h:'語',r:'어',m:'말씀'},{h:'便',r:'편',m:'편하다'},
+    {h:'紙',r:'지',m:'종이'},{h:'自',r:'자',m:'스스로'},{h:'車',r:'차',m:'차'}
+  ],
+  ch7:[
+    {h:'竹',r:'죽',m:'대나무'},{h:'故',r:'고',m:'연고, 예'},{h:'友',r:'우',m:'벗'},{h:'莫',r:'막',m:'없다'},
+    {h:'逆',r:'역',m:'거스르다'},{h:'知',r:'지',m:'알다'},{h:'交',r:'교',m:'사귀다'},{h:'石',r:'석',m:'돌'},
+    {h:'岩',r:'암',m:'바위'},{h:'化',r:'화',m:'되다'},{h:'製',r:'제',m:'짓다'},{h:'田',r:'전',m:'밭'},
+    {h:'耕',r:'경',m:'밭 갈다'},{h:'油',r:'유',m:'기름'},{h:'園',r:'원',m:'동산'},{h:'稅',r:'세',m:'세금'},
+    {h:'戶',r:'호',m:'집'},{h:'關',r:'관',m:'관계하다'},{h:'內',r:'내',m:'안'},{h:'城',r:'성',m:'성'},
+    {h:'窓',r:'창',m:'창문'},{h:'客',r:'객',m:'손님'},{h:'乘',r:'승',m:'타다'},{h:'列',r:'렬',m:'벌이다'},
+    {h:'飮',r:'음',m:'마시다'},{h:'淨',r:'정',m:'깨끗하다'},{h:'香',r:'향',m:'향기'},{h:'銀',r:'은',m:'은'},
+    {h:'質',r:'질',m:'바탕'},{h:'易',r:'역',m:'바꾸다'},{h:'遊',r:'유',m:'놀다'},{h:'外',r:'외',m:'바깥'},
+    {h:'絶',r:'절',m:'끊다'},{h:'朋',r:'붕',m:'벗'},{h:'信',r:'신',m:'믿다'},{h:'親',r:'친',m:'친하다'},
+    {h:'舊',r:'구',m:'예'},{h:'門',r:'문',m:'문'},{h:'水',r:'수',m:'물'}
+  ],
+  ch8:[
+    {h:'言',r:'언',m:'말씀'},{h:'骨',r:'골',m:'뼈'},{h:'忠',r:'충',m:'충성'},{h:'頂',r:'정',m:'정수리'},
+    {h:'針',r:'침',m:'바늘'},{h:'寸',r:'촌',m:'마디'},{h:'鐵',r:'철',m:'쇠'},{h:'殺',r:'살',m:'죽이다'},
+    {h:'行',r:'행',m:'다니다'},{h:'致',r:'치',m:'이르다'},{h:'衆',r:'중',m:'무리'},{h:'約',r:'약',m:'맺다'},
+    {h:'論',r:'론',m:'논하다'},{h:'遺',r:'유',m:'남기다'},{h:'話',r:'화',m:'말씀'},{h:'句',r:'구',m:'글귀'},
+    {h:'造',r:'조',m:'만들다'},{h:'單',r:'단',m:'홑'},{h:'用',r:'용',m:'쓰다'},{h:'對',r:'대',m:'대하다'},
+    {h:'通',r:'통',m:'통하다'},{h:'頭',r:'두',m:'머리'},{h:'絲',r:'사',m:'실'},{h:'路',r:'로',m:'길'},
+    {h:'橋',r:'교',m:'다리'},{h:'純',r:'순',m:'순수하다'},{h:'巨',r:'거',m:'크다'},{h:'全',r:'전',m:'온전하다'},
+    {h:'證',r:'증',m:'증거'},{h:'個',r:'개',m:'낱'},{h:'表',r:'표',m:'겉'},{h:'現',r:'현',m:'나타나다'},
+    {h:'生',r:'생',m:'나다, 살다'},{h:'活',r:'활',m:'살다'},{h:'注',r:'주',m:'물 대다'},{h:'意',r:'의',m:'뜻'},
+    {h:'中',r:'중',m:'가운데'},{h:'有',r:'유',m:'있다'}
+  ]
+};
+var WORDS=[
+  {h:'出席',r:'출석',m:'자리에 나감',chap:'6과'},{h:'入試',r:'입시',m:'입학시험',chap:'6과'},
+  {h:'昨年',r:'작년',m:'지난해',chap:'6과'},{h:'歲月',r:'세월',m:'흘러가는 시간',chap:'6과'},
+  {h:'讀書',r:'독서',m:'책을 읽음',chap:'6과'},{h:'修身',r:'수신',m:'몸과 마음을 닦음',chap:'6과'},
+  {h:'愛國',r:'애국',m:'나라를 사랑함',chap:'6과'},{h:'登山',r:'등산',m:'산에 오름',chap:'6과'},
+  {h:'多情',r:'다정',m:'정이 많음',chap:'6과'},{h:'日出',r:'일출',m:'해가 뜸',chap:'6과'},
+  {h:'入學',r:'입학',m:'학교에 들어감',chap:'6과'},{h:'年少',r:'연소',m:'나이가 어림',chap:'6과'},
+  {h:'巖石',r:'암석',m:'바위와 돌',chap:'7과'},{h:'化石',r:'화석',m:'돌로 변한 생물 흔적',chap:'7과'},
+  {h:'耕田',r:'경전',m:'밭을 갊',chap:'7과'},{h:'油田',r:'유전',m:'석유가 나는 밭',chap:'7과'},
+  {h:'田園',r:'전원',m:'논밭과 동산',chap:'7과'},{h:'城門',r:'성문',m:'성의 문',chap:'7과'},
+  {h:'車窓',r:'차창',m:'차의 창문',chap:'7과'},{h:'客車',r:'객차',m:'손님을 태우는 차',chap:'7과'},
+  {h:'乘車',r:'승차',m:'차를 탐',chap:'7과'},{h:'列車',r:'열차',m:'기차',chap:'7과'},
+  {h:'飮水',r:'음수',m:'물을 마심',chap:'7과'},{h:'淨水',r:'정수',m:'깨끗한 물',chap:'7과'},
+  {h:'香水',r:'향수',m:'향기 나는 물',chap:'7과'},{h:'外交',r:'외교',m:'나라 간 교류',chap:'7과'},
+  {h:'絶交',r:'절교',m:'교제를 끊음',chap:'7과'},
+  {h:'言約',r:'언약',m:'말로 맺은 약속',chap:'8과'},{h:'言論',r:'언론',m:'말로 의견을 밝힘',chap:'8과'},
+  {h:'遺言',r:'유언',m:'죽기 전에 남긴 말',chap:'8과'},{h:'單語',r:'단어',m:'낱낱의 말',chap:'8과'},
+  {h:'對話',r:'대화',m:'서로 이야기함',chap:'8과'},{h:'通話',r:'통화',m:'전화로 말함',chap:'8과'},
+  {h:'話題',r:'화제',m:'이야기거리',chap:'8과'},{h:'鐵橋',r:'철교',m:'쇠로 만든 다리',chap:'8과'},
+  {h:'巨人',r:'거인',m:'몸이 매우 큰 사람',chap:'8과'},{h:'個人',r:'개인',m:'낱낱의 사람',chap:'8과'},
+  {h:'全人',r:'전인',m:'완전한 인격의 사람',chap:'8과'},{h:'證人',r:'증인',m:'증거가 되는 사람',chap:'8과'}
+];
+var IDIOMS=[
+  {h:'東西南北',r:'동서남북',m:'동쪽, 서쪽, 남쪽, 북쪽'},
+  {h:'前後左右',r:'전후좌우',m:'앞, 뒤, 왼쪽, 오른쪽'},
+  {h:'高低長短',r:'고저장단',m:'높고 낮음, 길고 짧음'},
+  {h:'強弱輕重',r:'강약경중',m:'강함과 약함, 가벼움과 무거움'},
+  {h:'竹馬故友',r:'죽마고우',m:'어릴 때부터 함께 자란 친구'},
+  {h:'莫逆之友',r:'막역지우',m:'허물없이 매우 친한 친구'},
+  {h:'知彼知友',r:'지피지우',m:'나를 알아주는 친구'},
+  {h:'水魚之交',r:'수어지교',m:'물과 물고기처럼 뗄 수 없는 사이'},
+  {h:'朋友有信',r:'붕우유신',m:'친구 사이에는 믿음이 있어야 함'},
+  {h:'言中有骨',r:'언중유골',m:'말 속에 깊은 뜻이 있음'},
+  {h:'忠言逆耳',r:'충언역이',m:'충직한 말은 귀에 거슬림'},
+  {h:'頂門一針',r:'정문일침',m:'따끔한 충고나 교훈'},
+  {h:'寸鐵殺人',r:'촌철살인',m:'간단한 말로도 남을 감동시키거나 약점을 찌름'},
+  {h:'言行一致',r:'언행일치',m:'말과 행동이 일치함'},
+  {h:'百千萬億兆',r:'백천만억조',m:'매우 큰 수를 나타내는 단위들'}
+];
+var TOTAL=124;
+function pool(ci){
+  if(ci===0)return D.ch6.map(function(d){return Object.assign({},d,{chap:'6과'});});
+  if(ci===1)return D.ch7.map(function(d){return Object.assign({},d,{chap:'7과'});});
+  if(ci===2)return D.ch8.map(function(d){return Object.assign({},d,{chap:'8과'});});
+  return pool(0).concat(pool(1)).concat(pool(2));
+}
+function wordPool(ci){
+  if(ci===0)return WORDS.filter(function(w){return w.chap==='6과';});
+  if(ci===1)return WORDS.filter(function(w){return w.chap==='7과';});
+  if(ci===2)return WORDS.filter(function(w){return w.chap==='8과';});
+  return WORDS;
+}
+function sh(a){return a.slice().sort(function(){return Math.random()-.5;});}
+function rnd(a,n){return sh(a).slice(0,n);}
+function mkOpts(all,correct,key,disp){
+  return sh([correct].concat(sh(all.filter(function(d){return d[key]!==correct[key];})).slice(0,4))).map(function(d){return d[disp];});
+}
+function esc(s){return (s+'').replace(/'/g,"\\'");}
+var S={
+  wrong:JSON.parse(localStorage.getItem('hm_w')||'[]'),
+  learned:JSON.parse(localStorage.getItem('hm_l')||'[]'),
+  qcnt:parseInt(localStorage.getItem('hm_q')||'0'),
+  fc:[],fci:0,fcr:false,fcOk:0,fcFail:0,lastChap:0,
+  qd:[],qi:0,qOk:0,qFail:0,lastQType:'hm',lastQChap:0,lastQMode:'quiz',
+  id:[],ii:0,idOk:0,idFail:0,
+  eq:[],ei:0,ec:0,etimer:null,esecs:0
+};
+function save(){
+  try{localStorage.setItem('hm_w',JSON.stringify(S.wrong));localStorage.setItem('hm_l',JSON.stringify(S.learned));localStorage.setItem('hm_q',S.qcnt);}catch(e){}
+}
+function updateHome(){
+  var n=S.learned.length;
+  document.getElementById('total-learned').textContent=n;
+  document.getElementById('total-wrong').textContent=S.wrong.length;
+  document.getElementById('total-quiz').textContent=S.qcnt;
+  document.getElementById('xp-text').textContent=n+' / '+TOTAL+' 한자';
+  document.getElementById('xp-bar').style.width=Math.round(n/TOTAL*100)+'%';
+}
+function go(id){
+  document.querySelectorAll('.screen').forEach(function(s){s.classList.remove('active');});
+  document.getElementById(id).classList.add('active');
+  window.scrollTo(0,0);
+  if(id==='home')updateHome();
+  if(id==='wrong-screen')renderWrong();
+  if(id==='idiom-screen'){document.getElementById('idiom-main').style.display='block';document.getElementById('idiom-done').style.display='none';initIdiom();}
+}
+function startFlash(ci){
+  S.fc=sh(pool(ci));S.fci=0;S.fcr=false;S.fcOk=0;S.fcFail=0;S.lastChap=ci;
+  document.getElementById('fc-main').style.display='block';document.getElementById('fc-done').style.display='none';
+  go('flash-screen');
+  document.getElementById('flash-title').textContent=['6과','7과','8과','전체'][ci]+' 플래시카드';
+  renderFC();
+}
+function retryWrong(){
+  var wc=S.fc.filter(function(d){return S.wrong.some(function(w){return w.h===d.h;});});
+  if(!wc.length){alert('틀린 카드가 없어요!');return;}
+  S.fc=sh(wc);S.fci=0;S.fcr=false;S.fcOk=0;S.fcFail=0;
+  document.getElementById('fc-main').style.display='block';document.getElementById('fc-done').style.display='none';
+  renderFC();
+}
+function renderFC(){
+  var d=S.fc[S.fci],tot=S.fc.length;
+  document.getElementById('fc-prog').textContent=(S.fci+1)+'/'+tot;
+  document.getElementById('fc-pbar').style.width=Math.round((S.fci+1)/tot*100)+'%';
+  document.getElementById('fc-hanja').textContent=d.h;
+  document.getElementById('fc-reading').textContent=d.r+' ('+d.h+')';
+  document.getElementById('fc-meaning').textContent=d.m;
+  document.getElementById('fc-chap').textContent=d.chap||'';
+  document.getElementById('fc-front').style.display='flex';
+  document.getElementById('fc-front').style.flexDirection='column';
+  document.getElementById('fc-front').style.alignItems='center';
+  document.getElementById('fc-back').style.display='none';
+  document.getElementById('fc-actions').style.display='none';
+  S.fcr=false;
+}
+function revealCard(){
+  if(S.fcr)return;S.fcr=true;playSound('flip');
+  document.getElementById('fc-front').style.display='none';
+  document.getElementById('fc-back').style.display='block';
+  document.getElementById('fc-actions').style.display='flex';
+}
+function markCard(ok){
+  var d=S.fc[S.fci];
+  if(ok){S.fcOk++;playSound('correct');if(S.learned.indexOf(d.h)<0)S.learned.push(d.h);S.wrong=S.wrong.filter(function(w){return w.h!==d.h;});}
+  else{S.fcFail++;playSound('wrong');if(!S.wrong.some(function(w){return w.h===d.h;}))S.wrong.push(Object.assign({},d));}
+  save();
+  if(S.fci>=S.fc.length-1)showFCDone();else navCard(1);
+}
+function navCard(dir){playSound('flip');S.fci=Math.max(0,Math.min(S.fc.length-1,S.fci+dir));renderFC();}
+function showFCDone(){
+  playSound('complete');
+  document.getElementById('fc-main').style.display='none';document.getElementById('fc-done').style.display='block';
+  document.getElementById('fc-pbar').style.width='100%';document.getElementById('fc-prog').textContent='완료!';
+  document.getElementById('fc-done-sub').textContent='총 '+S.fc.length+'장 완료';
+  document.getElementById('fc-ok').textContent=S.fcOk;document.getElementById('fc-fail').textContent=S.fcFail;updateHome();
+}
+function startQuiz(ci,type){
+  var p=pool(ci);S.lastQChap=ci;S.lastQType=type;S.lastQMode='quiz';S.qOk=0;S.qFail=0;
+  S.qd=sh(p).slice(0,Math.min(20,p.length)).map(function(item){
+    var q,ans,opts;
+    if(type==='hm'){q=item.h;ans=item.m;opts=mkOpts(p,item,'m','m');}
+    else{q=item.m;ans=item.h;opts=mkOpts(p,item,'h','h');}
+    return{item:item,type:type,q:q,ans:ans,opts:opts};
+  });
+  S.qi=0;
+  document.getElementById('quiz-main').style.display='block';document.getElementById('quiz-done').style.display='none';
+  document.getElementById('quiz-back-btn').onclick=function(){go('quiz-chap');};
+  document.getElementById('quiz-reselect-btn').innerHTML='📋 다른 과 선택';
+  document.getElementById('quiz-reselect-btn').onclick=function(){go('quiz-chap');};
+  document.getElementById('quiz-done-icon').textContent='🎯';
+  document.getElementById('quiz-done-title').textContent='퀴즈 완료!';
+  document.getElementById('quiz-next-quest-btn').onclick=function(){go('idiom-screen');};
+  document.getElementById('quiz-next-quest-btn').innerHTML='✨ 사자성어 퀴즈로<div class="next-menu-label">다음 단계 ▶</div>';
+  go('quiz-screen');
+  document.getElementById('quiz-title').textContent=['6과','7과','8과','전체','심화'][ci]+' 퀴즈';
+  renderQ();
+}
+function startWordQuiz(ci){
+  var p=wordPool(ci);S.lastQChap=ci;S.lastQType='word';S.lastQMode='word';S.qOk=0;S.qFail=0;
+  var all=wordPool(3);
+  S.qd=sh(p).slice(0,Math.min(20,p.length)).map(function(item){
+    var opts=sh([item].concat(sh(all.filter(function(d){return d.h!==item.h;})).slice(0,4))).map(function(d){return d.m;});
+    return{item:item,type:'word',q:item.h,sub:item.r,ans:item.m,opts:opts};
+  });
+  S.qi=0;
+  document.getElementById('quiz-main').style.display='block';document.getElementById('quiz-done').style.display='none';
+  document.getElementById('quiz-back-btn').onclick=function(){go('word-chap');};
+  document.getElementById('quiz-reselect-btn').innerHTML='📗 다른 단어 선택';
+  document.getElementById('quiz-reselect-btn').onclick=function(){go('word-chap');};
+  document.getElementById('quiz-done-icon').textContent='📗';
+  document.getElementById('quiz-done-title').textContent='단어 퀴즈 완료!';
+  document.getElementById('quiz-next-quest-btn').onclick=function(){go('idiom-screen');};
+  document.getElementById('quiz-next-quest-btn').innerHTML='✨ 사자성어 퀴즈로<div class="next-menu-label">다음 단계 ▶</div>';
+  go('quiz-screen');
+  document.getElementById('quiz-title').textContent=['6과','7과','8과','전체'][ci]+' 단어 퀴즈';
+  renderQ();
+}
+function reStartQuiz(){if(S.lastQMode==='word')startWordQuiz(S.lastQChap);else startQuiz(S.lastQChap,S.lastQType);}
+function renderQ(){
+  var q=S.qd[S.qi],tot=S.qd.length;
+  document.getElementById('quiz-prog').textContent=(S.qi+1)+'/'+tot;
+  document.getElementById('quiz-pbar').style.width=Math.round((S.qi+1)/tot*100)+'%';
+  var qc=document.getElementById('quiz-qc');
+  if(q.type==='word')
+    qc.innerHTML='<div style="text-align:center"><div style="font-size:42px;color:#fff;letter-spacing:5px">'+q.q+'</div><div style="font-size:16px;color:#a78bfa;margin-top:8px">'+q.sub+'</div><div style="font-size:13px;color:#a09ec0;margin-top:4px">이 단어의 뜻은?</div></div>';
+  else if(q.type==='hm')
+    qc.innerHTML='<div class="quiz-q-hanja">'+q.q+'</div>';
+  else
+    qc.innerHTML='<div class="quiz-q-text">"'+q.q+'"<br><span style="font-size:14px;color:#a78bfa;margin-top:6px;display:block">이 뜻의 한자는?</span></div>';
+  var html='';
+  for(var i=0;i<q.opts.length;i++){
+    html+='<button class="quiz-opt" data-ans="'+esc(q.ans)+'" data-chosen="'+esc(q.opts[i])+'" onclick="ansQ(this,\'quiz\')"><span class="opt-num">'+(i+1)+'</span>'+q.opts[i]+'</button>';
+  }
+  document.getElementById('quiz-opts').innerHTML=html;
+  document.getElementById('quiz-fb').innerHTML='';
+  document.getElementById('quiz-next').style.display='none';
+}
+function ansQ(btn,pfx){
+  var chosen=btn.getAttribute('data-chosen');
+  var ans=btn.getAttribute('data-ans');
+  document.querySelectorAll('#'+pfx+'-opts .quiz-opt').forEach(function(b){b.onclick=null;});
+  S.qcnt++;
+  var ok=chosen===ans;
+  var q=pfx==='quiz'?S.qd[S.qi]:S.eq[S.ei];
+  if(ok){
+    playSound('correct');btn.classList.add('correct');
+    document.getElementById(pfx+'-fb').innerHTML='<div class="quiz-fb ok">✓ 정답!</div>';
+    if(q&&q.item&&S.learned.indexOf(q.item.h)<0)S.learned.push(q.item.h);
+    if(q&&q.item)S.wrong=S.wrong.filter(function(w){return w.h!==q.item.h;});
+    if(pfx==='quiz')S.qOk++;else if(pfx==='exam')S.ec++;
+  }else{
+    playSound('wrong');btn.classList.add('wrong');
+    document.querySelectorAll('#'+pfx+'-opts .quiz-opt').forEach(function(b){
+      if(b.getAttribute('data-chosen')===ans)b.classList.add('reveal-correct');
+    });
+    document.getElementById(pfx+'-fb').innerHTML='<div class="quiz-fb fail">✗ 정답: '+ans+'</div>';
+    if(q&&q.item&&!S.wrong.some(function(w){return w.h===q.item.h;}))S.wrong.push(Object.assign({},q.item));
+    if(pfx==='quiz')S.qFail++;
+  }
+  save();document.getElementById(pfx+'-next').style.display='block';
+}
+function nextQuiz(){if(S.qi<S.qd.length-1){S.qi++;renderQ();}else showQuizDone();}
+function showQuizDone(){
+  playSound('complete');
+  document.getElementById('quiz-main').style.display='none';document.getElementById('quiz-done').style.display='block';
+  document.getElementById('quiz-pbar').style.width='100%';document.getElementById('quiz-prog').textContent='완료!';
+  var tot=S.qd.length,score=Math.round(S.qOk/tot*100);
+  document.getElementById('quiz-done-sub').textContent=tot+'문제 완료';
+  document.getElementById('quiz-ok').textContent=S.qOk;document.getElementById('quiz-fail').textContent=S.qFail;
+  document.getElementById('quiz-score').textContent=score+'점';document.getElementById('quiz-total').textContent=tot;updateHome();
+}
+function initIdiom(){
+  S.id=sh(IDIOMS);S.ii=0;S.idOk=0;S.idFail=0;
+  document.getElementById('idiom-main').style.display='block';document.getElementById('idiom-done').style.display='none';
+  renderIdiom();
+}
+function renderIdiom(){
+  var d=S.id[S.ii],tot=S.id.length;
+  document.getElementById('idiom-prog').textContent=(S.ii+1)+'/'+tot;
+  document.getElementById('idiom-pbar').style.width=Math.round((S.ii+1)/tot*100)+'%';
+  document.getElementById('idiom-hanja').textContent=d.h;
+  document.getElementById('idiom-reading').textContent=d.r;
+  var opts=sh([d].concat(rnd(IDIOMS.filter(function(i){return i.h!==d.h;}),4))).slice(0,5).map(function(i){return i.m;});
+  var html='';
+  for(var i=0;i<opts.length;i++){
+    html+='<button class="quiz-opt" data-ans="'+esc(d.m)+'" data-chosen="'+esc(opts[i])+'" onclick="ansIdiom(this)"><span class="opt-num">'+(i+1)+'</span>'+opts[i]+'</button>';
+  }
+  document.getElementById('idiom-opts').innerHTML=html;
+  document.getElementById('idiom-fb').innerHTML='';document.getElementById('idiom-next').style.display='none';
+}
+function ansIdiom(btn){
+  var c=btn.getAttribute('data-chosen'),a=btn.getAttribute('data-ans');
+  document.querySelectorAll('#idiom-opts .quiz-opt').forEach(function(b){b.onclick=null;});
+  if(c===a){
+    playSound('correct');btn.classList.add('correct');
+    document.getElementById('idiom-fb').innerHTML='<div class="quiz-fb ok">✓ 정답!</div>';S.idOk++;
+  }else{
+    playSound('wrong');btn.classList.add('wrong');
+    document.querySelectorAll('#idiom-opts .quiz-opt').forEach(function(b){if(b.getAttribute('data-chosen')===a)b.classList.add('reveal-correct');});
+    document.getElementById('idiom-fb').innerHTML='<div class="quiz-fb fail">✗ 정답: '+a+'</div>';S.idFail++;
+  }
+  document.getElementById('idiom-next').style.display='block';
+}
+function nextIdiom(){if(S.ii<S.id.length-1){S.ii++;renderIdiom();}else showIdiomDone();}
+function showIdiomDone(){
+  playSound('complete');
+  document.getElementById('idiom-main').style.display='none';document.getElementById('idiom-done').style.display='block';
+  document.getElementById('idiom-pbar').style.width='100%';document.getElementById('idiom-prog').textContent='완료!';
+  document.getElementById('idiom-ok').textContent=S.idOk;document.getElementById('idiom-fail').textContent=S.idFail;
+  document.getElementById('idiom-score').textContent=Math.round(S.idOk/IDIOMS.length*100)+'점';updateHome();
+}
+function renderWrong(){
+  var el=document.getElementById('wrong-content');
+  if(!S.wrong.length){
+    el.innerHTML='<div class="empty-state"><div style="font-size:48px">🎉</div><div style="font-size:16px;font-weight:700;color:#00c47a;margin-top:12px">오답이 없습니다!</div><div style="font-size:13px;color:#a09ec0;margin-top:6px">완벽해요!</div></div>';return;
+  }
+  var html='<button class="clear-btn" onclick="clearWrong()">🗑 오답 초기화</button><div class="wrong-list">';
+  for(var i=0;i<S.wrong.length;i++){
+    var d=S.wrong[i];
+    html+='<div class="wrong-item"><div class="wrong-hanja">'+d.h+'</div><div class="wrong-info"><div class="wread">'+d.r+' ('+d.h+')</div><div class="wmean">'+d.m+'</div>'+(d.chap?'<div style="font-size:11px;color:#a09ec0">'+d.chap+'</div>':'')+'</div><div class="wrong-badge">오답</div></div>';
+  }
+  html+='</div>';el.innerHTML=html;
+}
+function clearWrong(){if(confirm('오답노트를 초기화할까요?')){S.wrong=[];save();renderWrong();}}
+function toggleOpt(el){el.classList.toggle('on');}
+function selOne(el){
+  document.querySelectorAll('.echk[data-g="'+el.getAttribute('data-g')+'"]').forEach(function(e){e.classList.remove('on');});
+  el.classList.add('on');
+}
+function getSettings(){
+  return{
+    chaps:Array.from(document.querySelectorAll('.echk[data-g="chap"].on')).map(function(e){return parseInt(e.getAttribute('data-v'));}) ,
+    types:Array.from(document.querySelectorAll('.echk[data-g="type"].on')).map(function(e){return e.getAttribute('data-v');}),
+    cnt:parseInt((document.querySelector('.echk[data-g="cnt"].on')||{getAttribute:function(){return '20';}}).getAttribute('data-v')),
+    time:parseInt((document.querySelector('.echk[data-g="time"].on')||{getAttribute:function(){return '0';}}).getAttribute('data-v'))
+  };
+}
+function buildExam(s){
+  var p=[];s.chaps.forEach(function(ci){p=p.concat(pool(ci));});
+  var qs=[];
+  sh(s.types).forEach(function(type){
+    var n=Math.ceil(s.cnt/s.types.length);
+    if(type==='idiom'){
+      sh(IDIOMS).slice(0,n).forEach(function(d){
+        var opts=sh([d].concat(rnd(IDIOMS.filter(function(i){return i.h!==d.h;}),4))).slice(0,5).map(function(i){return i.m;});
+        qs.push({type:'idiom',q:d.h,sub:d.r,ans:d.m,opts:opts,item:d});
+      });
+    }else if(type==='word'){
+      var wp=WORDS.filter(function(w){return s.chaps.some(function(ci){return ['6과','7과','8과'][ci]===w.chap;});});
+      var src=wp.length?wp:WORDS;
+      sh(src).slice(0,n).forEach(function(item){
+        var opts=sh([item].concat(sh(src.filter(function(d){return d.h!==item.h;})).slice(0,4))).map(function(d){return d.m;});
+        qs.push({type:'word',q:item.h,sub:item.r,ans:item.m,opts:opts,item:item});
+      });
+    }else{
+      sh(p).slice(0,n).forEach(function(item){
+        var q,ans,opts;
+        if(type==='hm'){q=item.h;ans=item.m;opts=mkOpts(p,item,'m','m');}
+        else{q=item.m;ans=item.h;opts=mkOpts(p,item,'h','h');}
+        qs.push({type:type,q:q,ans:ans,opts:opts,item:item});
+      });
+    }
+  });
+  return sh(qs).slice(0,s.cnt);
+}
+function startExam(){
+  var s=getSettings();S.eq=buildExam(s);S.ei=0;S.ec=0;
+  if(S.etimer)clearInterval(S.etimer);S.esecs=s.time;go('exam-screen');
+  if(s.time>0){
+    document.getElementById('exam-timer').textContent=fmt(S.esecs);
+    S.etimer=setInterval(function(){S.esecs--;document.getElementById('exam-timer').textContent=fmt(S.esecs);if(S.esecs<=0){clearInterval(S.etimer);finishExam();}},1000);
+  }else document.getElementById('exam-timer').textContent='';
+  renderExam();
+}
+function fmt(s){return Math.floor(s/60)+':'+('0'+s%60).slice(-2);}
+function renderExam(){
+  var q=S.eq[S.ei],tot=S.eq.length;
+  document.getElementById('exam-title').textContent=(S.ei+1)+'/'+tot+'문제';
+  document.getElementById('exam-pbar').style.width=Math.round((S.ei+1)/tot*100)+'%';
+  var qc=document.getElementById('exam-qc');
+  if(q.type==='idiom')
+    qc.innerHTML='<div class="idiom-hanja" style="font-size:28px">'+q.q+'</div><div style="font-size:14px;color:#f59e0b;margin-top:8px">'+q.sub+'</div>';
+  else if(q.type==='word')
+    qc.innerHTML='<div style="text-align:center"><div style="font-size:40px;color:#fff;letter-spacing:4px">'+q.q+'</div><div style="font-size:15px;color:#a78bfa;margin-top:8px">'+q.sub+'</div></div>';
+  else if(q.type==='hm')
+    qc.innerHTML='<div class="quiz-q-hanja">'+q.q+'</div>';
+  else
+    qc.innerHTML='<div class="quiz-q-text">"'+q.q+'"의 한자는?</div>';
+  var html='';
+  for(var i=0;i<q.opts.length;i++){
+    html+='<button class="quiz-opt" data-ans="'+esc(q.ans)+'" data-chosen="'+esc(q.opts[i])+'" onclick="ansQ(this,\'exam\')"><span class="opt-num">'+(i+1)+'</span>'+q.opts[i]+'</button>';
+  }
+  document.getElementById('exam-opts').innerHTML=html;
+  document.getElementById('exam-fb').innerHTML='';document.getElementById('exam-next').style.display='none';
+}
+function nextExam(){if(S.ei<S.eq.length-1){S.ei++;renderExam();}else finishExam();}
+function finishExam(){
+  if(S.etimer)clearInterval(S.etimer);playSound('complete');
+  var tot=S.eq.length,c=S.ec,score=Math.round(c/tot*100);
+  document.getElementById('res-score').textContent=score;
+  document.getElementById('res-grade').textContent=score>=90?'🏆 최고!':score>=80?'🥈 우수!':score>=70?'🥉 양호':score>=60?'😅 분발':'📚 더 공부해요';
+  document.getElementById('res-ok').textContent=c;document.getElementById('res-fail').textContent=tot-c;document.getElementById('res-tot').textContent=tot;
+  go('result-screen');
+}
+updateHome();
+</script>
+</body>
+</html>
